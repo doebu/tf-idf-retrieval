@@ -26,13 +26,19 @@ def preprocess_text(text: str) -> list[str]:
     tokens = [stemmer.stem(token) for token in tokens if token not in stop_words]
     return tokens
 
+def ambil_angka(nama_file):
+    angka = re.search(r'\d+', nama_file)
+    if angka:
+        return int(angka.group())
+    return 0
+
 @st.cache_data(show_spinner="Membaca dokumen...")
 def load_documents(folder: str) -> dict:
     docs = {}
 
     if not os.path.isdir(folder):
         return docs
-    for fname in sorted(os.listdir(folder)):
+    for fname in sorted(os.listdir(folder), key=ambil_angka):
         if fname.endswith(".txt"):
             path = os.path.join(folder, fname)
             with open(path, "r", encoding="utf-8") as f:
