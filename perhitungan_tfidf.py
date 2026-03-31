@@ -68,16 +68,16 @@ def build_tf(documents: dict) -> pd.DataFrame:
 @st.cache_data(show_spinner="Menghitung IDF...")
 def build_idf(documents: dict) -> pd.DataFrame:
     all_terms = sorted(set().union(*documents.values()))
-    num_docs = len(documents)
+    N = len(documents)
 
     rows = []
     for term in all_terms:
         df_val = sum(1 for tokens in documents.values() if term in tokens)
-        idf_val = round(math.log10(num_docs / df_val), 4) if df_val > 0 else 0
+        idf_val = round(math.log10(N / df_val), 4) if df_val > 0 else 0
         rows.append({
             "Term": term,
             "DF (Jumlah Dokumen)": df_val,
-            f"IDF (log({num_docs}/DF))": idf_val
+            f"IDF (log({N}/DF))": idf_val
         })
 
     return pd.DataFrame(rows).set_index("Term")
@@ -95,7 +95,7 @@ def build_tfidf(tf_df: pd.DataFrame, idf_df: pd.DataFrame) -> pd.DataFrame:
     return tfidf_df
 
 def computer_query_tables(query_terms: list[str], documents: dict, tf_df: pd.DataFrame, idf_df: pd.DataFrame, tfidf_df: pd.DataFrame):
-    num_docs = len(documents)
+    N = len(documents)
     idf_col = idf_df.columns[-1]
 
     tf_rows = {}
@@ -117,7 +117,7 @@ def computer_query_tables(query_terms: list[str], documents: dict, tf_df: pd.Dat
         idf_rows.append({
             "Term": term,
             "DF (Jumlah Dokumen)": df_val,
-            f"IDF (log({num_docs}/DF))": idf_val
+            f"IDF (log({N}/DF))": idf_val
         })
 
     idf_query = pd.DataFrame(idf_rows).set_index("Term")
@@ -221,10 +221,10 @@ if query_input:
 
             st.markdown("---")
             st.subheader("📌 Perhitungan Inverse Document Frequency (IDF)")
-            num_docs = len(documents)
-            st.latex(r"IDF(t) = \log_{10} \frac{num_docs}{DF(t)}")
+            N = len(documents)
+            st.latex(r"IDF(t) = \log_{10} \frac{N}{DF(t)}")
             st.caption(
-                f"**num_docs** = Jumlah total dokumen = **{num_docs}**   \n"
+                f"**N** = Jumlah total dokumen = **{N}**   \n"
                 "**DF(t)** = Jumlah dokumen yang mengandung term t  \n"
                 "IDF tinggi -> term langka (lebih informatif). IDF rendah -> term umum di banyak dokumen"
             )
@@ -233,7 +233,7 @@ if query_input:
             idf_display = idf_q.copy()
             idf_display[idf_col] = idf_display.apply(
                 lambda row: (
-                    f"log({num_docs}/{int(row['DF (Jumlah Dokumen)'])}) = {row[idf_col]}"
+                    f"log({N}/{int(row['DF (Jumlah Dokumen)'])}) = {row[idf_col]}"
                     if row["DF (Jumlah Dokumen)"] > 0 else "0"
                 ),
                 axis=1
@@ -286,9 +286,9 @@ with tab1:
 
 with tab2:
     st.subheader("Inverse Document Frequency - Seluruh Term")
-    num_docs = len(documents)
-    st.latex(r"IDF(t) = \log_{10} \frac{num_docs}{DF(t)}")
-    st.caption(f"num_docs = {num_docs} dokumen. Menampilkan semua {len(idf_df)} term.")
+    N = len(documents)
+    st.latex(r"IDF(t) = \log_{10} \frac{N}{DF(t)}")
+    st.caption(f"N = {N} dokumen. Menampilkan semua {len(idf_df)} term.")
 
     filter_idf = st.text_input("🔍 Filter term:", key="filter_idf")
     if filter_idf:
