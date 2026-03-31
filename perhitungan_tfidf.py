@@ -204,7 +204,8 @@ if query_input:
             st.latex(r"TF(t,\, d) = \frac{\text{jumlah kemunculan } t \text{ dalam dokumen } d}{\text{total kata dalam dokumen } d}")
             st.caption("Nilai TF menunjukkan seberapa sering sebuah term (kata) muncul dalam satu dokumen relatif terhadap panjang dokumen.")
 
-            tf_display = tf_q.copy()
+            tf_display = tf_q.copy().astype(str)
+            tf_display = tf_display.replace("0.0", "0")
             doc_names = list(documents.keys())
             for term in tf_q.index:
                 for doc in doc_names:
@@ -229,7 +230,8 @@ if query_input:
             )
 
             idf_col = idf_q.columns[-1]
-            idf_display = idf_q.copy()
+            idf_display = idf_q.copy().astype(str)
+            idf_display = idf_display.replace("0.0", "0")
             idf_display[idf_col] = idf_display.apply(
                 lambda row: (
                     f"log({num_docs}/{int(row['DF (Jumlah Dokumen)'])}) = {row[idf_col]}"
