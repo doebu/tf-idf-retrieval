@@ -230,8 +230,7 @@ if query_input:
             )
 
             idf_col = idf_q.columns[-1]
-            idf_display = idf_q.copy().astype(str)
-            idf_display = idf_display.replace("0.0", "0")
+            idf_display = idf_q.copy()
             idf_display[idf_col] = idf_display.apply(
                 lambda row: (
                     f"log({num_docs}/{int(row['DF (Jumlah Dokumen)'])}) = {row[idf_col]}"
